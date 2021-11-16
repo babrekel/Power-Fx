@@ -310,3 +310,6 @@ true
 
 >> "This string {{ has }} curly braces"
 "This string {{ has }} curly braces"
+
+>> $""
+""
