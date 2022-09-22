@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using Microsoft.PowerFx.Core.Types;
 using Microsoft.PowerFx.Types;
 using Xunit;
 
@@ -91,12 +92,23 @@ namespace Microsoft.PowerFx.Core.Tests
         }
 
         [Fact]
-        public void TestDateNoUTC()
+        internal void TestDateNoUTC()
         {
             var utc = new DateTime(2011, 3, 6, 0, 0, 0, DateTimeKind.Utc);
+            Assert.Throws<ArgumentException>(() => FormulaValue.NewDateOnly(utc));
+        }
+
+        [Theory]
+        [InlineData(DKind.DateTimeNoTimeZone, DateTimeKind.Utc)]
+        [InlineData(DKind.DateTime, DateTimeKind.Local)]
+        [InlineData(DKind.DateTime, DateTimeKind.Unspecified)]
+        public void TestDateUTC(object expectedKind, DateTimeKind dateKind)
+        {
+            var utc = new DateTime(2011, 3, 6, 0, 0, 0, dateKind);
 
             Assert.Throws<ArgumentException>(() => FormulaValue.NewDateOnly(utc));
-            Assert.Throws<ArgumentException>(() => FormulaValue.New(utc));
+            var value = FormulaValue.New(utc);
+            Assert.Equal(expectedKind, value.IRContext.ResultType._type.Kind);
         }
 
         [Fact]

@@ -90,10 +90,12 @@ namespace Microsoft.PowerFx.Types
         {
             if (value.Kind == DateTimeKind.Utc)
             {
-                throw new ArgumentException("Invalid DateTimeValue, the provided DateTime must be local");
+                return new DateTimeValue(IRContext.NotInSource(FormulaType.DateTimeNoTimeZone), value);
             }
-
-            return new DateTimeValue(IRContext.NotInSource(FormulaType.DateTime), value);
+            else
+            {
+                return new DateTimeValue(IRContext.NotInSource(FormulaType.DateTime), value);
+            }
         }
 
         public static TimeValue New(TimeSpan value)

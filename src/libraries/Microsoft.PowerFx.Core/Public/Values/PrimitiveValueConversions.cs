@@ -138,10 +138,32 @@ namespace Microsoft.PowerFx.Types
                     result = FormulaValue.NewDateOnly(dateOffsetValue.DateTime);
                 }
             }
+            else if (type == FormulaType.DateTimeNoTimeZone)
+            {
+                // DateTime is broader (includes time). If they explicitly requested a Date, use that.
+                if (value is DateTime dateValue)
+                {
+                    if (dateValue.Kind != DateTimeKind.Utc)
+                    {
+                        throw new ArgumentException("Invalid DateTimeValue, the provided DateTime must be UTC when the type is DateTimeNoTimeZone");
+                    }
+
+                    result = FormulaValue.New(dateValue);
+                }
+                else if (value is DateTimeOffset dateOffsetValue)
+                {
+                    result = FormulaValue.NewDateOnly(dateOffsetValue.UtcDateTime);
+                }
+            }
             else if (type == FormulaType.DateTime)
             {
                 if (value is DateTime dateValue)
                 {
+                    if (dateValue.Kind == DateTimeKind.Utc)
+                    {
+                        throw new ArgumentException("Invalid DateTimeValue, the provided DateTime must be Local when type is DateTime");
+                    }
+
                     result = FormulaValue.New(dateValue);
                 }
                 else if (value is DateTimeOffset dateOffsetValue)
